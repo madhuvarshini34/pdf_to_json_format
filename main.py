@@ -12,13 +12,13 @@ templates = Jinja2Templates(directory="templates")
 def identifier_for_pdf(file_path: str) -> str:
     """
     Extracts a unique identifier from the provided PDF and identifies its type.
-    Checks for keywords such as 'STATEMENT', 'IMAD', and 'OMAD' to classify the PDF type.
+    Checks for keywords such as 'IMAD', and 'OMAD' to classify the PDF type.
 
     Args:
         file_path (str): The path to the uploaded PDF file.
 
     Returns:
-        str: The identifier (e.g., "STATEMENT", "WIRE OUTGOING", etc.)
+        str: The identifier (e.g., "WIRE OUTGOING")
     """
     try:
         # Open the PDF file and extract text using PdfReader
