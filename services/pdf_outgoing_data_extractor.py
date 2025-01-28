@@ -3,17 +3,51 @@ import re
 import pdfplumber
 from collections import deque
 
-
 class OutgoingPDFData:
+    """
+    A class to extract structured data from PDF files, specifically handling outgoing PDF documents
+    and extracting fields using regular expressions.
+    """
+
     def __init__(self, pdf_folder_path: str):
+        """
+        Initializes the OutgoingPDFData class.
+
+        Args:
+            pdf_folder_path (str): Path to the folder containing PDF files.
+        """
         self.pdf_folder_path = pdf_folder_path
 
     @staticmethod
-    def safe_search(pattern, line, group=1, default="Unknown"):
+    def safe_search(pattern: str, line: str, group: int = 1, default: str = "Unknown") -> str:
+        """
+        Safely applies a regular expression pattern to a given line of text and returns the result.
+
+        Args:
+            pattern (str): Regular expression pattern to search for.
+            line (str): The line of text in which to perform the search.
+            group (int): Group number to return from the match (default is 1).
+            default (str): Default value to return if no match is found (default is "Unknown").
+
+        Returns:
+            str: The matched value or the default value if no match is found.
+        """
         match = re.search(pattern, line)
         return match.group(group) if match else default
 
-    def extract_outgoing_pdf(self, pdf_file_name: str):
+    def extract_outgoing_pdf(self, pdf_file_name: str) -> dict:
+        """
+        Extracts structured data from a PDF file using predefined regular expressions.
+
+        Args:
+            pdf_file_name (str): Name of the PDF file to process.
+
+        Returns:
+            dict: A dictionary containing the extracted data.
+
+        Raises:
+            FileNotFoundError: If the specified PDF file does not exist in the given folder.
+        """
         pdf_path = os.path.join(self.pdf_folder_path, pdf_file_name)
 
         # Check if the file exists
@@ -26,9 +60,8 @@ class OutgoingPDFData:
                 text += page.extract_text()
 
         lines = deque(text.splitlines())
-        
 
-        # Regular expressions for fields (same as before)
+        # Regular expressions for fields
         fields = {
             "environment": r"Environment:\s+([\w\-]+)",
             "aba": r"ABA:\s+(\d+)",
@@ -66,9 +99,9 @@ class OutgoingPDFData:
             "beneficiary_identifier": r"Identifier[:\s]+([\w\d]+)",
             "beneficiary_name": r"Name[:\s]+([\w ]+)",
             "beneficiary_address": r"Address[:\s]+([^\n]+)",
-            "beneficiary_information_text":  r"Text[:\s]+([\w ]+)",
+            "beneficiary_information_text": r"Text[:\s]+([\w ]+)",
         }
-        
+
         extracted_data = {}
         current_group = None
 
@@ -100,17 +133,16 @@ class OutgoingPDFData:
                         extracted_data[field_name] = value
                         break
 
+            # Beneficiary fields
             if current_group == "Beneficiary":
                 for field_name, pattern in beneficiary_fields.items():
                     value = self.safe_search(pattern, line)
                     if value != "Unknown":
                         extracted_data[field_name] = value
-                    
+
+        # Ensure all fields are present in the extracted data
         for field_name in fields.keys():
             if field_name not in extracted_data:
                 extracted_data[field_name] = None
-                
 
-    
         return extracted_data
-        
