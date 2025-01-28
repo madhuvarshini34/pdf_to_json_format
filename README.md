@@ -1,49 +1,92 @@
-# PDF Data Extractor
+# PDF Data Extractor Tool
 
-This project is designed to extract structured data from PDF files using **FastAPI** and **pdfplumber**. It processes PDF files, extracts relevant information with regular expressions, and returns the extracted data as flat JSON, ensuring simplicity and ease of use.
-
-## **Features**
-- Extracts structured data from PDF files.
-- Utilizes regular expressions to identify key details.
-- Returns extracted data in a flat JSON format (no nested structures).
-- Provides an API endpoint using **FastAPI** for seamless interaction with the extraction process.
-
-## **Requirements**
-- Python 3.8 or higher
-- **FastAPI**
-- **pdfplumber**
-- **re** (built-in Python module)
-- **collections.deque** (built-in Python module)
-- **Uvicorn** (to run the FastAPI server)
+This project is a lightweight and efficient tool designed to extract structured data from PDF documents. It leverages **FastAPI**, **pdfplumber**, and **HTML templates** for seamless data extraction and user interaction. The tool processes the PDF content using regular expressions and outputs the extracted data in a flat JSON format or displays it on a web page.
 
 ---
 
-## **Main Functions**
+## Features
 
-### **`safe_search(pattern, line, group=1, default="Unknown")`**
-A utility function that performs a safe search using regular expressions. It attempts to match the provided pattern within the given line. If a match is found, it returns the specified group; otherwise, it returns a default value.
-
-#### **Parameters**:
-- **`pattern`**: The regular expression pattern to search for.
-- **`line`**: The line of text in which to perform the search.
-- **`group`**: (Optional) The group number to return from the match (default is `1`).
-- **`default`**: (Optional) The default value to return if no match is found (default is `"Unknown"`).
-
-#### **Returns**:
-- The matched group value or the default value (`"Unknown"`).
+- Extracts and processes text from PDF documents.
+- Utilizes regular expressions to extract structured data fields.
+- Provides both REST API and HTML-based user interfaces via FastAPI.
+- Displays the extracted data on a web page using HTML templates.
 
 ---
 
-### **`extract_outgoing_data(pdf_path)`**
-This function processes the entire content of a PDF file and applies regular expressions to extract relevant fields. The result is returned as a flat dictionary for easy handling.
+## Project Structure
 
-#### **Parameters**:
-- **`pdf_path`**: The path to the PDF file to be processed.
+### **Packages and Modules**
 
-#### **Returns**:
-- A dictionary containing the extracted data. Fields may include:
-  - Environment
-  - ABA
-  - Amount
-  - Originator Name
-  - And more...
+#### 1. `pdf_processor`
+- **`Pdf_outgoing_extractor.py`**
+  - `extract_outgoing_data(pdf_path)`: Extracts structured data from PDF content using regex and returns a dictionary.
+  - `safe_search(pattern, line, group=1, default="Unknown")`: Safely applies regex to a given line of text and returns the result.
+
+#### 2. `API`
+- **`main.py`**
+  - Sets up the FastAPI server and exposes:
+    - `/extract`: API endpoint for PDF data extraction.
+    - `/upload`: HTML-based form for uploading a PDF and viewing results.
+
+#### 3. `templates`
+- Contains HTML templates for rendering the web interface:
+  - **`upload.html`**: A form for uploading PDF files. Displays the extracted data in a user-friendly table format.
+
+---
+
+## Libraries Utilized
+
+- **FastAPI**: For building the REST API and web application.
+- **Jinja2**: For rendering HTML templates.
+- **pdfplumber**: For extracting text from PDF documents.
+- **re**: For pattern matching and data extraction using regular expressions.
+- **Uvicorn**: For running the FastAPI server.
+
+---
+
+## Manual Inputs and Configuration
+
+### 1. Regular Expressions for Extraction
+Define regex patterns for extracting specific fields from the PDF content in the `pdf_processor` module.
+
+### 2. HTML Templates
+Ensure the `templates` folder contains:
+- **`upload.html`**: A file upload form with a submit button that displays extracted data in a structured table format.
+
+---
+
+## Usage
+
+### 1. Start the FastAPI Server
+Run the server using Uvicorn:
+```bash
+uvicorn main:app --reload
+```
+
+### 2. Access the Web Interface
+Navigate to `http://127.0.0.1:8000/upload` in a browser:
+- Upload a PDF file through the form.
+- View the extracted data on the result page.
+
+### 3. API Endpoint
+Use the `/extract` endpoint for direct API interaction.
+
+---
+
+## Example Workflow
+
+1. Place the PDF file in the project directory or upload it via the web interface.
+2. Start the FastAPI server using Uvicorn.
+3. Use the `/upload` endpoint for HTML-based interaction or `/extract` for API-based processing.
+4. View the extracted data either as JSON (API).
+
+---
+
+## Notes
+
+- Ensure regex patterns are updated to match changes in the PDF layout or format.
+- Install the required libraries before running the script:
+  ```bash
+  pip install fastapi uvicorn pdfplumber jinja2
+  ```
+- Use responsive design principles in the HTML templates for better usability.
